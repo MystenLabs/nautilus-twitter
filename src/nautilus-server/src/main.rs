@@ -18,7 +18,7 @@ use tracing_subscriber::filter::LevelFilter;
 #[tokio::main]
 async fn main() -> Result<()> {
     // This guard must be held for the duration of the program.
-    let _guard = configure_logging(LevelFilter::INFO).await;    
+    let _guard = configure_logging(LevelFilter::INFO).await;
     let eph_kp = Ed25519KeyPair::generate(&mut rand::thread_rng());
 
     // Start the metrics server
