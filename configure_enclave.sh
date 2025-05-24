@@ -424,9 +424,9 @@ bash -c "$(curl -L https://setup.vector.dev)"
 sudo dnf install vector -y
 # Install Vector config
 # remove the default vector.yaml file
-rm /etc/vector/vector.yaml
-cat >> /etc/vector/vector.toml <<EOF
-cat > /usr/lib/systemd/system/vector.service <<EOF
+sudo rm /etc/vector/vector.yaml
+sudo cat >> /etc/vector/vector.toml <<EOF
+sudo cat > /usr/lib/systemd/system/vector.service <<EOF
 
 # Install Grafana Agent config
 sudo mkdir -p /etc/alloy

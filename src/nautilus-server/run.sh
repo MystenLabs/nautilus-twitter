@@ -22,6 +22,7 @@ busybox ip link set dev lo up
 
 # Add a hosts record, pointing target site calls to local loopback
 echo "127.0.0.1   localhost" > /etc/hosts
+echo "127.0.0.65   logserver" >> /etc/hosts
 
 
 # == ATTENTION: code should be generated here that parses allowed_endpoints.yaml and populate domains here ===
@@ -46,6 +47,4 @@ echo "$JSON_RESPONSE" | jq -r 'to_entries[] | "\(.key)=\(.value)"' > /tmp/kvpair
 socat VSOCK-LISTEN:3000,reuseaddr,fork TCP:localhost:3000 &
 # Metrics listsens on Local VSOCK Port 9184 and forwards to localhost 9184
 socat VSOCK-LISTEN:9184,reuseaddr,fork TCP:localhost:9184 &
-# Logs listsens on Local VSOCK Port 8080 and forwards to localhost 2025
-socat VSOCK-LISTEN:8080,reuseaddr,fork TCP:localhost:2025 &
 /nautilus-server

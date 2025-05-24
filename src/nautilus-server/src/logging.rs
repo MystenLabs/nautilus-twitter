@@ -135,7 +135,7 @@ impl LogServerLayer {
 pub async fn configure_logging(level: LevelFilter) -> Result<TelemetryGuards> {
     // Define the Log Server endpoint URL
     let log_server_endpoint =
-        std::env::var("LOG_SERVER_ENDPOINT").unwrap_or("http://localhost:8080".to_string());
+        std::env::var("LOG_SERVER_ENDPOINT").unwrap_or("http://logserver:8080".to_string());
 
     // Create the custom layer
     let log_server_layer = LogServerLayer::new(log_server_endpoint, level);
