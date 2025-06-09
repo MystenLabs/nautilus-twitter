@@ -494,6 +494,9 @@ for ep in $ENDPOINTS; do
     port_forwarder=$((port_forwarder+1))
 done
 
+# Add a traffic forwarder
+traffic_config="${traffic_config}python3 /traffic_forwarder.py 127.0.0.65 8080 3 8102 &"$'\n'
+
 echo "Adding the following traffic forwarder configuration to src/nautilus-server/run.sh:"
 echo "$traffic_config"
 
