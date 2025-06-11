@@ -378,7 +378,11 @@ EOF
 # Append endpoint configuration to the vsock-proxy YAML if endpoints were provided.
 if [ -n "$ENDPOINTS" ]; then
     for ep in $ENDPOINTS; do
-        echo "echo \"- {address: $ep, port: 443}\" | sudo tee -a /etc/nitro_enclaves/vsock-proxy.yaml" >> user-data.sh
+        if [ "$ep" = "logserver" ]; then
+            echo "echo \"- {address: $ep, port: 8080}\" | sudo tee -a /etc/nitro_enclaves/vsock-proxy.yaml" >> user-data.sh
+        else
+            echo "echo \"- {address: $ep, port: 443}\" | sudo tee -a /etc/nitro_enclaves/vsock-proxy.yaml" >> user-data.sh
+        fi
     done
 fi
 
@@ -403,8 +407,12 @@ EOF
 if [ -n "$ENDPOINTS" ]; then
     PORT=8101
     for ep in $ENDPOINTS; do
-        echo "vsock-proxy $PORT $ep 443 --config /etc/nitro_enclaves/vsock-proxy.yaml &" >> user-data.sh
-        PORT=$((PORT+1))
+        if [ "$ep" = "logserver" ]; then
+            echo "vsock-proxy 8102 $ep 8080 --config /etc/nitro_enclaves/vsock-proxy.yaml &" >> user-data.sh
+        else
+            echo "vsock-proxy $PORT $ep 443 --config /etc/nitro_enclaves/vsock-proxy.yaml &" >> user-data.sh
+            PORT=$((PORT+1))
+        fi
     done
 fi
 
@@ -489,9 +497,13 @@ ip_forwarder=64
 port_forwarder=8101
 traffic_config=""
 for ep in $ENDPOINTS; do
-    traffic_config="${traffic_config}python3 /traffic_forwarder.py 127.0.0.${ip_forwarder} 443 3 ${port_forwarder} &"$'\n'
+    if [ "$ep" = "logserver" ]; then
+        traffic_config="${traffic_config}python3 /traffic_forwarder.py 127.0.0.${ip_forwarder} 8080 3 8102 &"$'\n'
+    else
+        traffic_config="${traffic_config}python3 /traffic_forwarder.py 127.0.0.${ip_forwarder} 443 3 ${port_forwarder} &"$'\n'
+        port_forwarder=$((port_forwarder+1))
+    fi
     ip_forwarder=$((ip_forwarder+1))
-    port_forwarder=$((port_forwarder+1))
 done
 
 echo "Adding the following traffic forwarder configuration to src/nautilus-server/run.sh:"
